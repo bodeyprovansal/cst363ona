@@ -124,7 +124,6 @@ readConfig()
 # create test data and write to employee.data, department.data and manager.data
 file_emp = open("employee.data", "w")
 file_dept = open("department.data", "w")
-file_mgr = open("manager.data", "w")
 # create 1000 departments and employees who are managers of the departments
 for dept in range(1, 1001):
    empid = 2*dept
@@ -132,8 +131,8 @@ for dept in range(1, 1001):
    dept_name = "Dept #"+str(dept)
    salary = random.randint(100000, 150000)
    file_emp.write(str(empid)+', "'+name+'", '+str(dept)+', '+str(salary)+'\n')
-   file_dept.write(str(dept)+', "'+dept_name+'"\n')
-   file_mgr.write(str(empid)+', '+str(dept)+'\n')
+   file_dept.write(str(dept)+', "'+dept_name+'", '+str(empid)+'\n')
+   
 # now generate 50000 other employees and assign to random departments
 for empid in range(3000, 53000):
    name = "Joe Employee"+str(empid)
@@ -142,20 +141,16 @@ for empid in range(3000, 53000):
    file_emp.write(str(empid)+', "'+name+'", '+str(dept)+', '+str(salary)+'\n')
 file_emp.close()
 file_dept.close()
-file_mgr.close()
+
    
 
 c = Coordinator()
 c.sendToAll("drop table if exists employee")
-c.sendToAll("drop table if exists manager")
 c.sendToAll("drop table if exists department")
 c.sendToAll("create table employee (empid int primary key, name char(20), dept int, salary double)") 
-c.sendToAll("create table manager (mgr_id int primary key, dept int)")
-c.sendToAll("create table department (dept int primary key, dept_name char(20))")
+c.sendToAll("create table department (dept int primary key, dept_name char(20), mgr_id int)")
 print("Loading employee table.  This will take a few minutes.")
 c.loadTable("employee", "employee.data")
-print("Loading manager table")
-c.loadTable("manager", "manager.data")
 print("Loading department table")
 c.loadTable("department", "department.data")
 c.close()
